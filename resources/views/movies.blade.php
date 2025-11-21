@@ -29,7 +29,7 @@
             <div class="relative overflow-hidden rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Top Movie</p>
+                        <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Most Viewed</p>
                         <h3 class="mt-2 text-xl font-bold text-neutral-900 dark:text-neutral-100">Twinkling Watermelon</h3>
                     </div>
                     <div class="rounded-full bg-purple-100 p-3 dark:bg-purple-900/30">
@@ -70,8 +70,8 @@
 
                         <div>
                             <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Duration</label>
-                            <input type="text" name="duration" value="{{ old('duration') }}" placeholder="Enter duration minutes" required class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100">
-                            @error('duration')
+                            <input type="text" name="duration_minutes" value="{{ old('duration_minutes') }}" placeholder="Enter duration minutes" required class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100">
+                            @error('duration_minutes')
                                 <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
@@ -144,11 +144,11 @@
                                         <td class="px-4 py-3 text-center text-sm text-neutral-900 dark:text-neutral-100">
                                             <span class="movie-name-display">{{ $movie->title }}</span>
                                         </td>
-                                        <td class="px-4 py-3 text-sm text-neutral-600 dark:text-neutral-400">
+                                        <td class="px-4 py-3 text-center text-sm text-neutral-600 dark:text-neutral-400">
                                             {{ $movie->genre ? $movie->genre->name : 'N/A' }}
                                         </td>
                                         <td class="px-4 py-3 text-center text-sm text-neutral-900 dark:text-neutral-100">
-                                            <span class="movie-duration-display">{{ $movie->duration }}</span>
+                                            <span class="movie-duration-display">{{ $movie->duration_minutes }}</span>
                                         </td>
                                         <td class="px-4 py-3 text-center text-sm text-neutral-900 dark:text-neutral-100">
                                             <span class="movie-director-display">{{ $movie->director }}</span>
@@ -159,23 +159,25 @@
                                         <td class="px-4 py-3 text-center text-sm text-neutral-600 dark:text-neutral-400">
                                             <span class="movie-poster-display">{{ $movie->poster ? basename($movie->poster) : 'N/A' }}</span>
                                         </td>
-                                        <td class="px-4 py-3 text-center text-sm">
+                                        <td class="px-4 py-3 text-center text-sm inline-flex">
                                             <button onclick="editMovie(
                                                 {{ $movie->id }},
                                                 '{{ addslashes($movie->title) }}',
                                                 '{{ $movie->genre_id }}',
-                                                '{{ $movie->duration }}',
+                                                '{{ $movie->duration_minutes }}',
                                                 '{{ addslashes($movie->director) }}',
                                                 '{{ addslashes($movie->description) }}',
-                                                @if($movie->poster) '{{ asset('storage/' . $movie->poster) }}' @else null @endif
-                                            )" class="text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                                            ); event.stopPropagation();" class="text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
                                                 Edit
                                             </button>
+
                                             <span class="mx-1 text-neutral-400">|</span>
-                                            <form id="deleteForm{{ $movie->id }}" action="{{ route('movies.destroy', $movie->id) }}" method="POST" class="inline">
+                                           
+                                            <form action="{{ route('movies.destroy', $movie->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to move this movie to trash?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="button" data-id="{{ $movie->id }}"class="delete-btn text-red-600 transition-colors hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                                                <button type="submit"
+                                                    class="delete-btn text-red-600 transition-colors hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
                                                     Delete
                                                 </button>
                                             </form>
@@ -196,7 +198,7 @@
         </div>
     </div>
 
-    <div id="editMovieModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50">
+    <div id="editMovieModal" class="fixed inset-0 hidden items-center justify-center bg-black/50 z-[9999]">
         <div class="w-full max-w-2xl rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800">
             <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">Edit Movie</h2>
 
@@ -205,21 +207,48 @@
                 @method('PUT')
 
                 <div class="grid gap-4 md:grid-cols-2">
+
+                    <!-- Movie Name -->
                     <div>
                         <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Movie Name</label>
-                        <input type="text" id="edit_movie_name" name="movie_name" required
+                        <input type="text" id="edit_movie_name" name="title"
                                class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100">
                     </div>
-
-
+                
+                    <!-- Genre -->
+                    <div>
+                        <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Genre</label>
+                        <select id="edit_genre_select" name="genre_id" required
+                            class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100">
+                            <option value="">Select a genre</option>
+                            @foreach($genres as $genre)
+                                <option value="{{ $genre->id }}">{{ $genre->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                
+                    <!-- Duration -->
+                    <div>
+                        <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Duration</label>
+                        <input type="text" id="edit_duration" name="duration_minutes"
+                            class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100">
+                    </div>
+                
+                    <!-- Director -->
+                    <div>
+                        <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Director</label>
+                        <input type="text" id="edit_director" name="director"
+                            class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100">
+                    </div>
+                
+                    <!-- Description -->
                     <div class="md:col-span-2">
                         <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Description</label>
                         <textarea id="edit_description" name="description" rows="3"
-                                  class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"></textarea>
+                            class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"></textarea>
                     </div>
-                </div>
 
-                <div class="mt-6 flex justify-end gap-3">
+                <div class="md:col-span-2 mt-6 flex justify-end gap-3">
                     <button type="button" onclick="closeEditModal()"
                             class="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700">
                         Cancel
@@ -252,33 +281,17 @@
             }
         }
 
-        function editMovie(id, name, genre_id, duration, director, description, posterUrl = null) {
+        function editMovie(id, name, genre_id, duration_minutes, director, description) {
             document.getElementById('editMovieModal').classList.remove('hidden');
             document.getElementById('editMovieModal').classList.add('flex');
             document.getElementById('editMovieForm').action = `/movies/${id}`;
                 
             // Set form fields
             document.getElementById('edit_movie_name').value = name;
-            document.getElementById('edit_genre_id').value = genre_id;
-            document.getElementById('edit_duration').value = duration;
+            document.getElementById('edit_genre_select').value = genre_id;
+            document.getElementById('edit_duration').value = duration_minutes;
             document.getElementById('edit_director').value = director;
             document.getElementById('edit_description').value = description || '';
-                
-            // Poster preview
-            const previewEl = document.getElementById('posterPreview');
-            const fileNameEl = document.getElementById('posterFileName');
-            const labelEl = document.getElementById('choosePosterLabel');
-                
-            if(posterUrl){
-                previewEl.src = posterUrl;
-                previewEl.classList.remove('hidden');
-                fileNameEl.textContent = posterUrl.split('/').pop();
-                labelEl.textContent = "Change poster";
-            } else {
-                previewEl.classList.add('hidden');
-                fileNameEl.textContent = '';
-                labelEl.textContent = "Choose a poster";
-            }
         }
         
         function closeEditModal() {
@@ -287,41 +300,8 @@
         
             // Clear form fields
             document.getElementById('editMovieForm').reset();
-        
-            // Clear poster preview
-            const previewEl = document.getElementById('posterPreview');
-            const fileNameEl = document.getElementById('posterFileName');
-            const labelEl = document.getElementById('choosePosterLabel');
-        
-            previewEl.classList.add('hidden');
-            fileNameEl.textContent = '';
-            labelEl.textContent = "Choose a poster";
-            document.getElementById('posterInput').value = '';
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const deleteButtons = document.querySelectorAll('.delete-btn');
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const MovieId = this.getAttribute('data-id');
-                    const form = document.getElementById('deleteForm' + MovieId);
-
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "This action cannot be undone!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'Yes, delete it!'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            form.submit();
-                        }
-                    });
-                });
-            });
-        });
     </script>
 </x-layouts.app>
 

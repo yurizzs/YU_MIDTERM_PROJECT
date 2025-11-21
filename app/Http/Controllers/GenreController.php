@@ -18,7 +18,7 @@ class GenreController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string|maax:1000',
+            'description' => 'nullable|string|max:1000',
         ]);
 
         Genre::create($validated);
@@ -34,11 +34,11 @@ class GenreController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string|maax:1000',
+            'description' => 'nullable|string|max:1000',
         ]);
 
         $genre->update($validated);
-        return redirect()-back()->with('success', 'Genre updated successfully.');
+        return redirect()->route('genres.store')->with('success', 'Genre updated successfully.');
     }
 
     public function trash()
@@ -54,10 +54,10 @@ class GenreController extends Controller
 
         if($genre->trashed()){
             $genre->forceDelete();
-            return redirect()->back()->with('success', 'Genre permanently deleted.');
+            return redirect()->route('dashboard')->with('success', 'Genre permanently deleted.');
         } else {
             $genre->delete();
-            return redirect()->back()->with('success', 'Genre moved to trash.');
+            return redirect()->route('trash')->with('success', 'Genre moved to trash.');
         }
     }
 

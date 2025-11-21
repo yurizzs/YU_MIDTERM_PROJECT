@@ -69,15 +69,18 @@
                                             <span class="genre-description-display">{{ Str::limit($genre->description, 50) ?? 'N/A' }}</span>
                                         </td>
                                         <td class="px-4 py-3 text-center text-sm">
-                                            <button onclick="editGenre({{ $genre->id }}, '{{ $genre->genre_name }}', '{{ addslashes($genre->description) }}')"
+                                            <button onclick="editGenre(
+                                                            {{ $genre->id }}, 
+                                                            '{{ addslashes($genre->name) }}', 
+                                                            '{{ addslashes($genre->description) }}')"
                                                     class="text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
                                                 Edit
                                             </button>
                                             <span class="mx-1 text-neutral-400">|</span>
-                                            <form id="deleteForm{{ $genre->id }}" action="{{ route('genres.destroy', $genre->id) }}" method="POST" class="inline">
+                                            <form action="{{ route('genres.destroy', $genre->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to move this genre to trash?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="button" data-id="{{ $genre->id }}"class="delete-btn text-red-600 transition-colors hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                                                <button type="submit" class="delete-btn text-red-600 transition-colors hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
                                                     Delete
                                                 </button>
                                             </form>
@@ -109,7 +112,7 @@
                 <div class="grid gap-4 md:grid-cols-2">
                     <div>
                         <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Genre Name</label>
-                        <input type="text" id="edit_genre_name" name="genre_name" required
+                        <input type="text" id="edit_genre_name" name="name" required
                                class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100">
                     </div>
 
@@ -136,10 +139,11 @@
     </div>
 
     <script>
-        function editGenrename, description) {
+        function editGenre (id, name, description) {
             document.getElementById('editGenreModal').classList.remove('hidden');
             document.getElementById('editGenreModal').classList.add('flex');
             document.getElementById('editGenreForm').action = `/genres/${id}`;
+
             document.getElementById('edit_genre_name').value = name;
             document.getElementById('edit_description').value = description || '';
         }
@@ -147,31 +151,8 @@
         function closeEditModal() {
             document.getElementById('editGenreModal').classList.add('hidden');
             document.getElementById('editGenreModal').classList.remove('flex');
-        }
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const deleteButtons = document.querySelectorAll('.delete-btn');
-        
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const studentId = this.getAttribute('data-id');
-                    const form = document.getElementById('deleteForm' + studentId);
-                
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "This action cannot be undone!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'Yes, delete it!'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            form.submit();
-                        }
-                    });
-                });
-            });
-        });
+            document.getElementById('editGenreForm').reset();
+        }
     </script>
 </x-layouts.app>
