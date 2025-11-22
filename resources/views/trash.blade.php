@@ -52,13 +52,13 @@
                             <div class="flex gap-2">
                             <form action="{{ route('genres.restore', $genre->id) }}" method="POST" class="flex-1">
                                 @csrf
-                                <button type="submit" class="w-full rounded bg-green-100 text-green-600 hover:bg-green-200 hover:text-green-700 py-2 transition restore-genre-btn" onsubmit="return confirm('Are you sure you want to restore this genre?')">Restore</button>
+                                <button type="submit" class="w-full rounded bg-green-300 text-black hover:bg-green-200 hover:text-green-700 py-2 transition restore-genre-btn" onsubmit="return confirm('Are you sure you want to restore this genre?')">Restore</button>
                             </form>
 
                             <form action="{{ route('genres.destroy', $genre->id) }}" method="POST" class="flex-1">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="w-full rounded bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700 py-2 transition delete-genre-btn" onsubmit="return confirm('Are you sure you want to permanently delete this genre?')">Delete</button>
+                                <button type="submit" class="w-full rounded bg-red-400 text-black hover:bg-red-200 hover:text-red-700 py-2 transition delete-genre-btn" onsubmit="return confirm('Are you sure you want to permanently delete this genre?')">Delete</button>
                             </form>
                         </div>
                     @endforeach
