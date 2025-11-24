@@ -10,7 +10,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $movies = Movie::latest()->take(5)->get();
+        $movies = Movie::latest()->get();
         $genres = Genre::all();
 
         return view('dashboard', compact('movies', 'genres'));

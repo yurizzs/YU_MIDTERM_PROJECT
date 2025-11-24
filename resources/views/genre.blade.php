@@ -2,10 +2,16 @@
     <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
 
         @if(session('success'))
-            <div class="rounded-lg bg-green-100 p-4 text-green-700 dark:bg-green-900/30 dark:text-green-300">
+            <div 
+                x-data="{ show: true }" 
+                x-show="show"
+                x-init="setTimeout(() => show = false, 3000)" 
+                class="rounded-lg bg-green-100 p-4 text-green-700 dark:bg-green-900/30 dark:text-green-300 transition-all duration-500"
+            >
                 {{ session('success') }}
             </div>
         @endif
+
 
         <div class="relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-800">
             <div class="flex h-full flex-col p-6">

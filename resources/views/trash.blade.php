@@ -1,8 +1,12 @@
 <x-layouts.app :title="__('Trash')">
     <div class="flex flex-col gap-6 p-6">
-        {{-- Success Message --}}
         @if(session('success'))
-            <div class="rounded-lg bg-green-100 p-4 text-sm text-green-800 dark:bg-green-900/30 dark:text-green-200">
+            <div 
+                x-data="{ show: true }" 
+                x-show="show"
+                x-init="setTimeout(() => show = false, 3000)" 
+                class="rounded-lg bg-green-100 p-4 text-green-700 dark:bg-green-900/30 dark:text-green-300 transition-all duration-500"
+            >
                 {{ session('success') }}
             </div>
         @endif
@@ -19,7 +23,7 @@
                         <p class="text-sm text-neutral-700 dark:text-neutral-300 mb-1"><strong>Genre:</strong> {{ $movie->genre ? $movie->genre->name : 'N/A' }}</p>
                         <p class="text-sm text-neutral-700 dark:text-neutral-300 mb-1"><strong>Duration:</strong> {{ $movie->duration_minutes }}</p>
                         <p class="text-sm text-neutral-700 dark:text-neutral-300 mb-1"><strong>Director:</strong> {{ $movie->director }}</p>
-                        <p class="text-sm text-neutral-700 dark:text-neutral-300 mb-4"><strong>Description:</strong> {{ $movie->description }}</p>
+                        <p class="text-sm text-neutral-700 dark:text-neutral-300 mb-4"><strong>Description:</strong> {{ Str::limit($movie->description, 25) }}</p>
 
                         <div class="flex gap-2">
                             <form action="{{ route('movies.restore', $movie->id) }}" method="POST" class="flex-1" onsubmit="return confirm('Are you sure you want to restore this movie?')">
