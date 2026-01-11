@@ -113,7 +113,7 @@ class MovieController extends Controller
 
     public function export(Request $request)
     {
-        $query = Movie::with('course');
+        $query = Movie::with('genre');
 
         if ($request->filled('search')) {
             $searchTerm = $request->search;
@@ -127,7 +127,7 @@ class MovieController extends Controller
             $query->where('genre_id', $request->genre_filter);
         }
 
-        $movies = $query->latest()->get();
+        $movie = $query->latest()->get();
 
         $filename = 'movies_export_' . date('Y-m-d_His') . '.pdf';
 
@@ -138,102 +138,135 @@ class MovieController extends Controller
             <title>Movies Export</title>
             <style>
                 body {
-                    font-family: Arial, sans-serif;
-                    padding: 20px;
-                    background-color: #f5f5f5;
-                }
-                .container {
-                    max-width: 1200px;
-                    margin: 0 auto;
-                    background-color: white;
+                    font-family: "Helvetica", Arial, sans-serif;
+                    background: #f3f4f6;
+                    margin: 0;
                     padding: 30px;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    color: #111827;
                 }
-                h1 {
-                    color: #333;
-                    text-align: center;
-                    margin-bottom: 10px;
+
+                .container {
+                    max-width: 1100px;
+                    margin: auto;
+                    background: #ffffff;
+                    padding: 32px;
+                    border-radius: 8px;
                 }
-                .export-info {
+
+                .header {
                     text-align: center;
-                    color: #666;
                     margin-bottom: 30px;
-                    font-size: 14px;
                 }
+
+                .header h1 {
+                    margin: 0;
+                    font-size: 26px;
+                    letter-spacing: 0.5px;
+                }
+
+                .header p {
+                    margin-top: 8px;
+                    font-size: 14px;
+                    color: #6b7280;
+                }
+
+                .divider {
+                    height: 2px;
+                    background: #e5e7eb;
+                    margin: 25px 0;
+                }
+
                 table {
                     width: 100%;
                     border-collapse: collapse;
-                    margin-bottom: 20px;
+                    font-size: 14px;
                 }
+
                 th {
-                    background-color: #4472C4;
-                    color: white;
-                    padding: 12px;
+                    background: #111827;
+                    color: #ffffff;
+                    padding: 12px 10px;
                     text-align: left;
-                    font-weight: bold;
-                    border: 1px solid #2e5c9a;
                 }
+
                 td {
-                    padding: 10px 12px;
-                    border: 1px solid #ddd;
+                    padding: 10px;
+                    border-bottom: 1px solid #e5e7eb;
+                    vertical-align: top;
                 }
+
                 tr:nth-child(even) {
-                    background-color: #f9f9f9;
+                    background: #f9fafb;
                 }
-                tr:hover {
-                    background-color: #f0f0f0;
+
+                .badge {
+                    display: inline-block;
+                    padding: 4px 8px;
+                    font-size: 12px;
+                    border-radius: 12px;
+                    background: #e0f2fe;
+                    color: #0369a1;
+                    font-weight: 600;
                 }
+
                 .footer {
-                    margin-top: 20px;
-                    padding: 15px;
-                    background-color: #f0f0f0;
-                    border-radius: 5px;
+                    margin-top: 30px;
                     text-align: center;
-                    font-weight: bold;
-                    color: #333;
+                    font-size: 13px;
+                    color: #6b7280;
                 }
+
                 @media print {
                     body {
-                        background-color: white;
+                        background: white;
+                        padding: 0;
                     }
                     .container {
-                        box-shadow: none;
+                        border-radius: 0;
                     }
                 }
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>Movies Export Report</h1>
-                <div class="export-info">
-                    Exported on: ' . date('F d, Y \a\t h:i A') . '<br>
-                    Total Records: ' . $movies->count() . '
+
+                <div class="header">
+                    <h1>Movies Report</h1>
+                    <p>
+                        Exported on ' . date('F d, Y \a\t h:i A') . '<br>
+                        Total Records: ' . $movie->count() . '
+                    </p>
                 </div>
+
+                <div class="divider"></div>
 
                 <table>
                     <thead>
                         <tr>
-                            <th>No.</th>
+                            <th>#</th>
                             <th>Title</th>
                             <th>Genre</th>
                             <th>Duration</th>
                             <th>Director</th>
                             <th>Description</th>
-                            <th>Added Date</th>
+                            <th>Added</th>
                         </tr>
                     </thead>
                     <tbody>';
 
+
                 $number = 1;
-                foreach ($movies as $movie) {
+                foreach ($movie as $movies) {
                     $html .= '<tr>
                     <td>' . $number++ . '</td>
-                    <td>' . htmlspecialchars($movie->title) . '</td>
-                    <td>' . htmlspecialchars($movie->genre ? $movie->genre->genre_id : 'No Genre') . '</td>
-                    <td>' . htmlspecialchars($movie->duration) . '</td>
-                    <td>' . htmlspecialchars($movie->director) . '</td>
-                    <td>' . htmlspecialchars($movie->description) . '</td>
-                    <td>' . $movie->created_at->format('Y-m-d H:i:s') . '</td>
+                    <td>' . htmlspecialchars($movies->title) . '</td>
+                    <td>
+                        <span class="badge">' . htmlspecialchars($movies->genre ? $movies->genre->name : 'No Genre') . '</span>
+                    </td>
+                    <td>' . htmlspecialchars($movies->duration_minutes) . '</td>
+                    <td>' . htmlspecialchars($movies->director ?? '-') . '</td>
+                    <td>' . htmlspecialchars($movies->description ?? '-') . '</td>
+                    <td>' . $movies->created_at->format('Y-m-d H:i:s') . '</td>
                 </tr>';
                 }
 
@@ -241,7 +274,8 @@ class MovieController extends Controller
                 </table>
 
                 <div class="footer">
-                    Total Movies: ' . $movies->count() . '
+                    Total Movies: ' . $movie->count() . ' <br/>
+                    © ' . date('Y') . ' Cine-Nook. All rights reserved.
                 </div>
             </div>
         </body>
