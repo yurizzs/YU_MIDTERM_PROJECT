@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Movie;
 use App\Models\Genre;
+use Illuminate\Support\Facades\Storage;
 
 class MovieController extends Controller
 {
@@ -24,24 +25,16 @@ class MovieController extends Controller
             'duration_minutes' => 'required|string|max:10',
             'director' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',
-            'poster' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5048',
+            'poster' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
-    
-        $posterPath = null;
-    
-        if ($request->hasFile('poster')) {
-            $posterFile = $request->file('poster');
 
-            // Get original filename (e.g., movie.jpg)
-            $originalName = $posterFile->getClientOriginalName();
-
-            // Make sure folder exists
-            $posterPath = 'posters/' . $originalName;
-
-            // Move manually
-            $posterFile->move(public_path('posters'), $originalName);
-        }else{
-            $posterPath = null;
+        if ($request->hasFile('poster')){
+            $originalName = pathinfo($request->file('poster')->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $request->file('poster')->getClientOriginalExtension();
+            $fileName = $originalName . '_' . time() . '.' . $extension;
+            $posterPath = $request->file('poster')->storeAs('posters', $fileName, 'public');
+            $validated['poster'] = $posterPath;
+            $validated['poster_original_name'] = $request->file('poster')->getClientOriginalName();
         }
     
         Movie::create([
@@ -64,16 +57,24 @@ class MovieController extends Controller
             'director' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',
             'genre_id' => 'required|exists:genres,id',
+            'poster' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $movie->update([
-            'title' => $validated['title'],
-            'genre_id' => $validated['genre_id'],
-            'duration_minutes' => $validated['duration_minutes'],
-            'director' => $validated['director'] ?? null,
-            'description' => $validated['description'] ?? null,
-        ]);
-        return redirect()->route('movies.store')->with('success', 'Movie updated successfully.');
+        if ($request->hasFile('poster')) {
+            if($movie->poster) {
+                Storage::disk('public')->delete($movie->poster);
+            }
+
+            $originalName = pathInfo($request->file('poster')->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $request->file('poster')->getClientOriginalExtension();
+            $fileName = $originalName . '_' . time() . '.' . $extension;
+            $posterPath = $request->file('poster')->storeAs('posters', $fileName, 'public');
+            $validated['poster'] = $posterPath;
+            $validated['poster_original_name'] = $request->file('poster')->getClientOriginalName();
+        }
+
+        $movie->update($validated);
+        return redirect()->route('movies.index')->with('success', 'Movie updated successfully.');
     }
 
     public function trash()
@@ -87,6 +88,10 @@ class MovieController extends Controller
     {
         $movie = Movie::withTrashed()->findOrFail($id);
 
+        if($movie->poster) {
+            Storage::disk('public')->delete($movie->poster);
+        }
+        
         if($movie->trashed())
         {
             $movie->forceDelete();

@@ -1,5 +1,15 @@
 <x-layouts.app :title="__('Movie Lists')">
 	<div class="space-y-6">
+         @if(session('success'))
+            <div 
+                x-data="{ show: true }" 
+                x-show="show"
+                x-init="setTimeout(() => show = false, 3000)" 
+                class="rounded-lg bg-green-100 p-4 text-green-700 dark:bg-green-900/30 dark:text-green-300 transition-all duration-500"
+            >
+                {{ session('success') }}
+            </div>
+        @endif
 		<!-- Top 3 cards -->
 		<div class="grid auto-rows-min gap-4 md:grid-cols-3">
             <div class="relative overflow-hidden rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800">
@@ -166,7 +176,7 @@
                                                 '{{ $movie->genre_id }}',
                                                 '{{ $movie->duration_minutes }}',
                                                 '{{ addslashes($movie->director) }}',
-                                                '{{ addslashes($movie->description) }}',
+                                                '{{ addslashes($movie->description) }}', '{{  $movie->poster}}'
                                             ); event.stopPropagation();" class="text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
                                                 Edit
                                             </button>
@@ -185,7 +195,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="px-4 py-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
+                                        <td colspan="8" class=" px-4 py-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
                                             No movies found. Add your first movie above!
                                         </td>
                                     </tr>
@@ -198,15 +208,25 @@
         </div>
     </div>
 
-    <div id="editMovieModal" class="fixed inset-0 hidden items-center justify-center bg-black/50 z-[9999]">
-        <div class="w-full max-w-2xl rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800">
+    <div id="editMovieModal" class="fixed inset-0 hidden flex
+            items-center justify-center
+            bg-black/50 z-[9999]
+            p-4 sm:p-6">
+        <div class="w-full max-w-md sm:max-w-2xl
+            max-h-[90vh]
+            overflow-y-auto
+            rounded-xl
+            border border-neutral-200
+            bg-white
+            p-4 sm:p-6
+            dark:border-neutral-700 dark:bg-neutral-800">
             <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">Edit Movie</h2>
 
-            <form id="editMovieForm" method="POST">
+            <form id="editMovieForm" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
-                <div class="grid gap-4 md:grid-cols-2">
+                <div class="grid gap-4 grid-cols-1 sm:grid-cols-2">
 
                     <!-- Movie Name -->
                     <div>
@@ -244,11 +264,56 @@
                     <!-- Description -->
                     <div class="md:col-span-2">
                         <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Description</label>
-                        <textarea id="edit_description" name="description" rows="3"
+                        <textarea id="edit_description" name="description" rows="1"
                             class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"></textarea>
                     </div>
 
-                <div class="md:col-span-2 mt-6 flex justify-end gap-3">
+                    <!-- Current Poster Preview -->
+                    <div class="md:col-span-2">
+                        <label class="mb-2 flex text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                            Current Poster
+                        </label>
+
+                        <div class="flex flex-col items-center gap-4">
+                            <div class="h-48 sm:h-40 w-full overflow-hidden rounded-lg border border-neutral-300 dark:border-neutral-600">
+                                <img
+                                    id="edit_poster_preview"
+                                    src=""
+                                    alt="Movie Poster"
+                                    class="h-full w-full object-cover hidden"
+                                >
+
+                                <div
+                                    id="edit_no_poster"
+                                    class="flex h-full w-full items-center justify-center text-sm text-neutral-500 dark:text-neutral-400"
+                                >
+                                    No Poster
+                                </div>
+                            </div>
+
+                            <!-- Upload New Poster -->
+                            <div class="flex-1">
+                                <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                                    Change Poster
+                                </label>
+                                <input
+                                    type="file"
+                                    name="poster"
+                                    accept="image/*"
+                                    onchange="previewEditPoster(event)"
+                                    class="w-full text-sm text-neutral-700 dark:text-neutral-300
+                                        file:mr-4 file:rounded-lg file:border-0
+                                        file:bg-blue-600 file:px-4 file:py-2
+                                        file:text-white hover:file:bg-blue-700"
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="md:col-span-2 mt-6 flex flex-col sm:flex-row
+            gap-3 sm:justify-end">
                     <button type="button" onclick="closeEditModal()"
                             class="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700">
                         Cancel
@@ -281,7 +346,7 @@
             }
         }
 
-        function editMovie(id, name, genre_id, duration_minutes, director, description) {
+        function editMovie(id, name, genre_id, duration_minutes, director, description, poster) {
             document.getElementById('editMovieModal').classList.remove('hidden');
             document.getElementById('editMovieModal').classList.add('flex');
             document.getElementById('editMovieForm').action = `/movies/${id}`;
@@ -292,6 +357,30 @@
             document.getElementById('edit_duration').value = duration_minutes;
             document.getElementById('edit_director').value = director;
             document.getElementById('edit_description').value = description || '';
+
+            const posterImg = document.getElementById('edit_poster_preview');
+            const noPoster = document.getElementById('edit_no_poster');
+
+            if (poster) {
+                posterImg.src = `/storage/${poster}`;
+                posterImg.classList.remove('hidden');
+                noPoster.classList.add('hidden');
+            } else {
+                posterImg.classList.add('hidden');
+                noPoster.classList.remove('hidden');
+            }
+        }
+
+        function previewEditPoster(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const posterImg = document.getElementById('edit_poster_preview');
+            const noPoster = document.getElementById('edit_no_poster');
+
+            posterImg.src = URL.createObjectURL(file);
+            posterImg.classList.remove('hidden');
+            noPoster.classList.add('hidden');
         }
         
         function closeEditModal() {
