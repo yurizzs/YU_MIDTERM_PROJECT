@@ -31,72 +31,72 @@
         </div>
 
         <!-- Search & Filter Section -->
-<div class="rounded-xl border mb-10 border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800">
-    <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-        Search & Filter Movies
-    </h2>
+        <div class="rounded-xl border mb-10 border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800">
+            <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+                Search & Filter Movies
+            </h2>
 
-    <form action="{{ route('dashboard') }}" method="GET" class="grid gap-4 md:grid-cols-3">
+            <form action="{{ route('dashboard') }}" method="GET" class="grid gap-4 md:grid-cols-3">
 
-        <!-- Search Input -->
-        <div class="md:col-span-1">
-            <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                Search
-            </label>
-            <input
-                type="text"
-                name="search"
-                value="{{ request('search') }}"
-                placeholder="Search by movie title"
-                class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm
-                       focus:border-[#224d4a] focus:outline-none focus:ring-2 focus:ring-[#224d4a]/20
-                       dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
-            >
-        </div>
-
-        <!-- Genre Filter Dropdown -->
-        <div class="md:col-span-1">
-            <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                Filter by Genre
-            </label>
-            <select
-                name="genre_filter"
-                class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm
-                       focus:border-[#224d4a] focus:outline-none focus:ring-2 focus:ring-[#224d4a]/20
-                       dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
-            >
-                <option value="">All Genres</option>
-                @foreach($genres as $genre)
-                    <option
-                        value="{{ $genre->id }}"
-                        {{ request('genre_filter') == $genre->id ? 'selected' : '' }}
+                <!-- Search Input -->
+                <div class="md:col-span-1">
+                    <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                        Search
+                    </label>
+                    <input
+                        type="text"
+                        name="search"
+                        value="{{ request('search') }}"
+                        placeholder="Search by movie title"
+                        class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm
+                            focus:border-[#224d4a] focus:outline-none focus:ring-2 focus:ring-[#224d4a]/20
+                            dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
                     >
-                        {{ $genre->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+                </div>
 
-        <!-- Action Buttons -->
-        <div class="flex items-end gap-2 md:col-span-1">
-            <button
-                type="submit"
-                class="flex-1 rounded-lg bg-[#224d4a] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#1b3f3c]"
-            >
-                Apply Filters
-            </button>
+                <!-- Genre Filter Dropdown -->
+                <div class="md:col-span-1">
+                    <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                        Filter by Genre
+                    </label>
+                    <select
+                        name="genre_filter"
+                        class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm
+                            focus:border-[#224d4a] focus:outline-none focus:ring-2 focus:ring-[#224d4a]/20
+                            dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
+                    >
+                        <option value="">All Genres</option>
+                        @foreach($genres as $genre)
+                            <option
+                                value="{{ $genre->id }}"
+                                {{ request('genre_filter') == $genre->id ? 'selected' : '' }}
+                            >
+                                {{ $genre->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-            <a
-                href="{{ route('dashboard') }}"
-                class="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700
-                       transition-colors hover:bg-neutral-100
-                       dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700"
-            >
-                Clear
-            </a>
+                <!-- Action Buttons -->
+                <div class="flex items-end gap-2 md:col-span-1">
+                    <button
+                        type="submit"
+                        class="flex-1 rounded-lg bg-[#224d4a] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#1b3f3c]"
+                    >
+                        Apply Filters
+                    </button>
+
+                    <a
+                        href="{{ route('dashboard') }}"
+                        class="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700
+                            transition-colors hover:bg-neutral-100
+                            dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700"
+                    >
+                        Clear
+                    </a>
+                </div>
+            </form>
         </div>
-    </form>
-</div>
 
             @foreach($genres as $genre)
 

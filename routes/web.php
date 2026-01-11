@@ -27,6 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/movies/trash', [MovieController::class, 'trash'])->name('trash');
     Route::delete('/movies/{id}', [MovieController::class, 'destroy'])->name('movies.destroy');
     Route::post('/movies/{id}/restore', [MovieController::class, 'restore'])->name('movies.restore');
+    Route::get('/movies/export', [MovieController::class, 'export'])->name('students.export');
     Route::resource('movies', MovieController::class);
 });
 

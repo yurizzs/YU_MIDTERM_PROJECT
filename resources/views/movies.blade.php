@@ -53,6 +53,22 @@
         
         <div class="relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-800">
             <div class="flex h-full flex-col p-6">
+
+                <div class="flex h-full flex-col p-6">
+                <div class="mb-4 flex justify-end">
+                    <form method="GET" action="{{ route('students.export') }}" class="inline">
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                        <input type="hidden" name="course_filter" value="{{ request('course_filter') }}">
+
+                        <button type="submit"
+                                class="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Export to PDF
+                        </button>
+                    </form>
+                </div>
                 <!-- Add New Movie Form -->
                 <div class="mb-6 rounded-lg border border-neutral-200 bg-neutral-50 p-6 dark:border-neutral-700 dark:bg-neutral-900/50">
                     <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">Add New Movie</h2>
@@ -129,6 +145,73 @@
                         </div>
                     </form>
                 </div>
+
+        <div class="rounded-xl border mb-10 border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800">
+            <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+                Search & Filter Movies
+            </h2>
+
+            <form action="{{ route('dashboard') }}" method="GET" class="grid gap-4 md:grid-cols-3">
+
+                <!-- Search Input -->
+                <div class="md:col-span-1">
+                    <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                        Search
+                    </label>
+                    <input
+                        type="text"
+                        name="search"
+                        value="{{ request('search') }}"
+                        placeholder="Search by movie title"
+                        class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm
+                            focus:border-[#224d4a] focus:outline-none focus:ring-2 focus:ring-[#224d4a]/20
+                            dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
+                    >
+                </div>
+
+                <!-- Genre Filter Dropdown -->
+                <div class="md:col-span-1">
+                    <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                        Filter by Genre
+                    </label>
+                    <select
+                        name="genre_filter"
+                        class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm
+                            focus:border-[#224d4a] focus:outline-none focus:ring-2 focus:ring-[#224d4a]/20
+                            dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
+                    >
+                        <option value="">All Genres</option>
+                        @foreach($genres as $genre)
+                            <option
+                                value="{{ $genre->id }}"
+                                {{ request('genre_filter') == $genre->id ? 'selected' : '' }}
+                            >
+                                {{ $genre->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-end gap-2 md:col-span-1">
+                    <button
+                        type="submit"
+                        class="flex-1 rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-800"
+                    >
+                        Apply Filters
+                    </button>
+
+                    <a
+                        href="{{ route('dashboard') }}"
+                        class="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700
+                            transition-colors hover:bg-neutral-100
+                            dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700"
+                    >
+                        Clear
+                    </a>
+                </div>
+            </form>
+        </div>
 
 		<!-- Movie List Table -->
                 <div class="flex-1 overflow-auto">
