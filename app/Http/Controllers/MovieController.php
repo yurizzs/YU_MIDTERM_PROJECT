@@ -10,9 +10,23 @@ use Dompdf\Dompdf;
 
 class MovieController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $movies = Movie::latest()->get();
+        $query = Movie::with('genre');
+
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', "%{$searchTerm}%")
+                ->orWhere('director', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        if ($request->filled('genre_filter') && $request->genre_filter != '') {
+            $query->where('genre_id', $request->genre_filter);
+        }
+
+        $movies = $query->latest()->get();
         $genres = Genre::all();
 
         return view('movies', compact('movies', 'genres'));
@@ -38,14 +52,7 @@ class MovieController extends Controller
             $validated['poster_original_name'] = $request->file('poster')->getClientOriginalName();
         }
     
-        Movie::create([
-            'title' => $validated['title'],
-            'genre_id' => $validated['genre_id'],
-            'duration_minutes' => $validated['duration_minutes'],
-            'director' => $validated['director'] ?? null,
-            'description' => $validated['description'] ?? null,
-            'poster' => $posterPath,
-        ]);
+        Movie::create($validated);
     
         return redirect()->route('dashboard')->with('success', 'Movie added successfully!');
     }

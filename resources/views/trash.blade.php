@@ -42,31 +42,69 @@
             </div>
         @endif
 
-        <h2 class="text-2xl font-semibold text-neutral-900 dark:text-neutral-100 mt-8">Trashed Genres</h2>
+        <h2 class="text-2xl font-semibold text-neutral-900 dark:text-neutral-100 mt-8">
+            Trashed Genres
+        </h2>
 
         @if($genres->isEmpty())
-            <p class="text-center text-neutral-700 dark:text-neutral-300 text-xl mt-4">No trashed genres found</p>
-            @else
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach ($genres as $genre)
-                        <div class="rounded-xl border border-neutral-200 bg-neutral-50 p-4 shadow-sm hover:shadow-sm transition dark:border-neutral-700 dark:bg-neutral-900/50">
-                            <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-2">{{ $genre->name }}</h3>
-                            <p class="text-sm text-neutral-700 dark:text-neutral-300 mb-4">{{ $genre->description ?? 'No description' }}</p>
+            <p class="text-center text-neutral-700 dark:text-neutral-300 text-xl mt-4">
+                No trashed genres found
+            </p>
+        @else
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach ($genres as $genre)
+                    <div
+                        class="rounded-xl border border-neutral-200 bg-neutral-50 p-4 shadow-sm
+                            hover:shadow-md transition
+                            dark:border-neutral-700 dark:bg-neutral-900/50"
+                    >
+                        <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
+                            {{ $genre->name }}
+                        </h3>
 
-                            <div class="flex gap-2">
-                            <form action="{{ route('genres.restore', $genre->id) }}" method="POST" class="flex-1">
+                        <p class="text-sm text-neutral-700 dark:text-neutral-300 mb-4">
+                            {{ $genre->description ?? 'No description' }}
+                        </p>
+
+                        <div class="flex gap-2">
+                            <form
+                                action="{{ route('genres.restore', $genre->id) }}"
+                                method="POST"
+                                class="flex-1"
+                                onsubmit="return confirm('Are you sure you want to restore this genre?')"
+                            >
                                 @csrf
-                                <button type="submit" class="w-full rounded bg-green-300 text-black hover:bg-green-200 hover:text-green-700 py-2 transition restore-genre-btn" onsubmit="return confirm('Are you sure you want to restore this genre?')">Restore</button>
+                                <button
+                                    type="submit"
+                                    class="w-full rounded bg-green-300 text-black
+                                        hover:bg-green-200 hover:text-green-700
+                                        py-2 transition"
+                                >
+                                    Restore
+                                </button>
                             </form>
 
-                            <form action="{{ route('genres.destroy', $genre->id) }}" method="POST" class="flex-1">
+                            <form
+                                action="{{ route('genres.destroy', $genre->id) }}"
+                                method="POST"
+                                class="flex-1"
+                                onsubmit="return confirm('Are you sure you want to permanently delete this genre?')"
+                            >
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="w-full rounded bg-red-400 text-black hover:bg-red-200 hover:text-red-700 py-2 transition delete-genre-btn" onsubmit="return confirm('Are you sure you want to permanently delete this genre?')">Delete</button>
+                                <button
+                                    type="submit"
+                                    class="w-full rounded bg-red-400 text-black
+                                        hover:bg-red-200 hover:text-red-700
+                                        py-2 transition"
+                                >
+                                    Delete
+                                </button>
                             </form>
                         </div>
-                    @endforeach
-                </div>
-            @endif
+                    </div>
+                @endforeach
+            </div>
+        @endif
     </div>
 </x-layouts.app>

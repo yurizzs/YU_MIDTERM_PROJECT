@@ -139,9 +139,9 @@
                 </h2>
     
                 <div class="mb-4 flex justify-end">
-                        <form method="GET" action="{{ route('students.export') }}" class="inline">
+                        <form method="GET" action="{{ route('movies.export') }}" class="inline">
                             <input type="hidden" name="search" value="{{ request('search') }}">
-                            <input type="hidden" name="course_filter" value="{{ request('course_filter') }}">
+                            <input type="hidden" name="genre_filter" value="{{ request('genre_filter') }}">
     
                             <button type="submit"
                                     class="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700">
@@ -154,7 +154,7 @@
                     </div>
             </div>
 
-            <form action="{{ route('dashboard') }}" method="GET" class="grid gap-4 md:grid-cols-3">
+            <form action="{{ route('movies.index') }}" method="GET" class="grid gap-4 md:grid-cols-3">
 
                 <!-- Search Input -->
                 <div class="md:col-span-1">
@@ -205,7 +205,7 @@
                     </button>
 
                     <a
-                        href="{{ route('dashboard') }}"
+                        href="{{ route('movies.index') }}"
                         class="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700
                             transition-colors hover:bg-neutral-100
                             dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700"

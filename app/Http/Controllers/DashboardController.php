@@ -10,7 +10,7 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Movie::with('genre');
+        $query = Movie::with('genre');  
 
         if ($request->filled('search')) {
             $searchTerm = $request->search;
